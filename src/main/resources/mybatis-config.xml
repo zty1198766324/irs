@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+  <plugins>
+    <!-- com.github.pagehelper为PageHelper类所在包名 -->
+    <plugin interceptor="com.github.pagehelper.PageInterceptor">
+      <!-- 使用MySQL方言的分页 -->
+      <property name="helperDialect" value="mysql"/>
+      <!--如果使用mysql，这里value为mysql-->
+      <property name="pageSizeZero" value="true"/>
+    </plugin>
+  </plugins>
+
+<mappers>
+  <mapper resource="mappers/AdminMapper.xml"></mapper>
+  <mapper resource="mappers/MenusMapper.xml"></mapper>
+  <mapper resource="mappers/RolesMapper.xml"></mapper>
+  <mapper resource="mappers/RolesMenusMapper.xml"></mapper>
+  <mapper resource="mappers/UserMapper.xml"></mapper>
+</mappers>
+
+</configuration>

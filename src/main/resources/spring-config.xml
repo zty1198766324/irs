@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+  <!-- 开启扫描,需要bean注入的类 -->
+  <context:component-scan base-package="com.ssm.irs"/>
+
+  <!--   连接数据库的配置 -->
+  <context:property-placeholder location="classpath:config/db.properties"/>
+
+  <!-- 配置数据源:使用c3p0数据库连接池 -->
+  <bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource" name="dataSource">
+    <property name="driverClass" value="${jdbc.driver}"/>
+    <property name="jdbcUrl" value="${jdbc.url}"/>
+    <property name="user" value="${jdbc.user}"/>
+    <property name="password" value="${jdbc.password}"/>
+  </bean>
+
+  <!--通过bean 注入的方式，注入sqlSession -->
+  <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+      <property name="configLocation" value="classpath:mybatis-config.xml"/>
+      <property name="dataSource" ref="dataSource"/>
+
+    <!-- 在spring配置mybatis分页插件PageHelper -->
+<!--    <property name="plugins">
+      <array>
+        <bean class="com.github.pagehelper.PageInterceptor">
+          <property name="properties">
+            &lt;!&ndash; 什么都不配，使用默认的配置 &ndash;&gt;
+            <value></value>
+          </property>
+        </bean>
+      </array>
+    </property>-->
+
+  </bean>
+
+  <!--sessionFactory 注入给dao/mapper层  -->
+  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    <property name="basePackage" value="com.ssm.irs.mapper"/>
+    <property name="sqlSessionFactoryBeanName" value="sessionFactory"/>
+  </bean>
+
+  <!-- 配置事务管理器 -->
+  <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <!-- 开启注解事务 -->
+  <tx:annotation-driven/>
+
+  <!-- 验证码 -->
+  <bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha">
+    <property name="config">
+      <bean class="com.google.code.kaptcha.util.Config">
+        <constructor-arg>
+          <props>
+            <prop key="kaptcha.border">no</prop>
+            <!--  <prop key="kaptcha.border.color">105,179,90</prop>   -->
+            <prop key="kaptcha.textproducer.font.color">blue</prop>
+            <prop key="kaptcha.image.width">125</prop>
+            <prop key="kaptcha.image.height">45</prop>
+            <prop key="kaptcha.textproducer.font.size">45</prop>
+            <prop key="kaptcha.session.key">code</prop>
+            <prop key="kaptcha.textproducer.char.length">4</prop>
+            <prop key="kaptcha.textproducer.font.names">宋体,楷体,微软雅黑</prop>
+          </props>
+        </constructor-arg>
+      </bean>
+    </property>
+  </bean>
+
+</beans>
